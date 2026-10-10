@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Briefing de site profissional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --navy:#14213D; --gold:#C9A227; --gold-soft:#F3E7B8;
+  --bg:#EEF0F4; --surface:#FFFFFF; --ink:#1E2430; --muted:#626B7C; --line:#DDE1E8; --field:#F7F8FA;
+  --ok:#2E7D5B; --focus:#3B5BDB;
+  --side:#14213D; --side-ink:#D8DCE5; --side-muted:#8E97AB;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1424; --surface:#172036; --ink:#E6E9F0; --muted:#9AA3B5; --line:#2A3550; --field:#1D2741;
+    --gold-soft:#3A3218; --side:#0A0F1C; --focus:#8FA8FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1424; --surface:#172036; --ink:#E6E9F0; --muted:#9AA3B5; --line:#2A3550; --field:#1D2741;
+  --gold-soft:#3A3218; --side:#0A0F1C; --focus:#8FA8FF;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0; height:100%; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit; color:inherit}
+:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+
+.app{display:grid; grid-template-columns:300px 1fr; height:100%}
+
+/* sidebar */
+.side{background:var(--side); color:var(--side-ink); display:flex; flex-direction:column; min-height:0}
+.brand{padding:26px 24px 18px}
+.brand h1{font-family:var(--display); font-weight:700; font-size:21px; line-height:1.15; margin:0; color:#fff}
+.brand p{margin:6px 0 0; font-size:13px; color:var(--side-muted)}
+.ring-wrap{display:flex; align-items:center; gap:14px; padding:4px 24px 20px; border-bottom:1px solid rgba(255,255,255,.08)}
+.ring{width:58px; height:58px; flex:none}
+.ring circle{fill:none; stroke-width:6}
+.ring .bgc{stroke:rgba(255,255,255,.12)}
+.ring .fg{stroke:var(--gold); stroke-linecap:round; transition:stroke-dashoffset .4s ease}
+.ring text{fill:#fff; font-family:var(--display); font-weight:700; font-size:15px}
+.ring-wrap small{display:block; font-size:12.5px; color:var(--side-muted)}
+.ring-wrap strong{display:block; font-size:14px; color:#fff; font-weight:600}
+nav.steps{overflow:auto; padding:10px 12px 20px; flex:1}
+.step-btn{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none; border:0; border-radius:10px; padding:9px 12px; cursor:pointer; color:var(--side-ink)}
+.step-btn:hover{background:rgba(255,255,255,.05)}
+.step-btn[aria-current="step"]{background:rgba(201,162,39,.14); color:#fff}
+.step-num{flex:none; width:26px; height:26px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:700; border:1.5px solid rgba(255,255,255,.22); color:var(--side-muted)}
+.step-btn[aria-current="step"] .step-num{border-color:var(--gold); color:var(--gold)}
+.step-btn.done .step-num{background:var(--gold); border-color:var(--gold); color:var(--navy)}
+.step-txt{flex:1; min-width:0}
+.step-txt span{display:block; font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.step-bar{height:3px; border-radius:2px; background:rgba(255,255,255,.1); margin-top:5px; overflow:hidden}
+.step-bar i{display:block; height:100%; background:var(--gold); width:0; transition:width .3s}
+.side-foot{padding:14px 24px 20px; border-top:1px solid rgba(255,255,255,.08); font-size:12.5px; color:var(--side-muted); display:flex; align-items:center; gap:8px}
+.dot{width:8px; height:8px; border-radius:50%; background:#4CAF7D; flex:none}
+.dot.saving{background:var(--gold)}
+
+/* main */
+.main{display:flex; flex-direction:column; min-height:0; min-width:0}
+.topbar{position:sticky; top:0; z-index:5; background:var(--surface); border-bottom:1px solid var(--line)}
+.top-inner{display:flex; align-items:center; gap:14px; padding:12px 32px}
+.menu-btn{display:none; border:1px solid var(--line); background:var(--field); border-radius:8px; padding:7px 12px; cursor:pointer; font-weight:600; font-size:13.5px}
+.top-title{font-size:13.5px; color:var(--muted); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.top-title b{color:var(--ink); font-weight:600}
+.pct{font-family:var(--display); font-weight:700; font-size:15px; color:var(--ink)}
+.icon-btn{border:1px solid var(--line); background:transparent; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px; color:var(--muted)}
+.progress{height:5px; background:var(--line)}
+.progress i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--navy),var(--gold)); transition:width .45s cubic-bezier(.2,.8,.2,1)}
+:root[data-theme="dark"] .progress i{background:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .progress i{background:var(--gold)}}
+
+.scroll{overflow:auto; flex:1; -webkit-overflow-scrolling:touch}
+.content{max-width:780px; margin:0 auto; padding:40px 32px 48px}
+.kicker{font-size:13px; font-weight:600; color:var(--gold); margin:0 0 6px}
+.content h2{font-family:var(--display); font-weight:700; font-size:clamp(26px,3.4vw,34px); line-height:1.12; margin:0 0 10px; letter-spacing:-.01em}
+.lead{color:var(--muted); margin:0 0 30px; max-width:62ch}
+.group-title{font-family:var(--display); font-weight:600; font-size:18px; margin:34px 0 4px}
+.group-hint{color:var(--muted); font-size:13.5px; margin:0 0 14px}
+
+.field{margin:0 0 20px}
+.field label.lb, .field .lb{display:block; font-weight:600; font-size:14px; margin-bottom:6px}
+.field .hint{display:block; font-weight:400; color:var(--muted); font-size:13px; margin-top:2px}
+.in{width:100%; background:var(--field); border:1.5px solid var(--line); border-radius:10px; padding:11px 13px; transition:border-color .15s, background .15s}
+.in:focus{outline:none; border-color:var(--focus); background:var(--surface)}
+textarea.in{min-height:96px; resize:vertical; line-height:1.5}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:0 18px}
+
+.opts{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px}
+.opt{position:relative}
+.opt input{position:absolute; opacity:0; inset:0; cursor:pointer}
+.opt span{display:flex; gap:10px; align-items:flex-start; border:1.5px solid var(--line); background:var(--field); border-radius:10px; padding:10px 12px; font-size:14px; cursor:pointer; transition:border-color .15s, background .15s; height:100%}
+.opt span::before{content:""; flex:none; width:17px; height:17px; margin-top:2px; border:1.5px solid var(--muted); border-radius:5px; background:var(--surface)}
+.opt input[type=radio] + span::before{border-radius:50%}
+.opt input:checked + span{border-color:var(--navy); background:var(--gold-soft)}
+.opt input:checked + span::before{background:var(--navy); border-color:var(--navy); box-shadow:inset 0 0 0 3px var(--surface)}
+:root[data-theme="dark"] .opt input:checked + span{border-color:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .opt input:checked + span{border-color:var(--gold)}}
+.opt input:focus-visible + span{outline:2px solid var(--focus); outline-offset:2px}
+.opt em{font-style:normal; color:var(--gold); font-weight:700; margin-left:2px}
+.limit{font-size:12.5px; color:var(--muted); margin-top:6px}
+.limit.warn{color:#C0392B}
+
+.rep-item{border:1.5px solid var(--line); border-radius:14px; padding:18px 18px 4px; margin-bottom:14px; background:var(--surface)}
+.rep-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
+.rep-head b{font-family:var(--display); font-size:15.5px}
+.rm{border:0; background:none; color:var(--muted); cursor:pointer; font-size:13px; text-decoration:underline; padding:4px}
+.add{border:1.5px dashed var(--muted); background:transparent; border-radius:12px; padding:12px 16px; width:100%; cursor:pointer; font-weight:600; color:var(--ink)}
+.add:hover{border-color:var(--navy); background:var(--field)}
+
+.note{background:var(--field); border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:13px 16px; font-size:14px; margin:6px 0 22px}
+.note b{font-weight:700}
+table.norms{width:100%; border-collapse:collapse; font-size:13.5px; margin:4px 0 8px}
+.tbl-wrap{overflow-x:auto; margin-bottom:18px}
+table.norms th{background:var(--navy); color:#fff; text-align:left; padding:9px 11px; font-weight:600}
+table.norms td{border-bottom:1px solid var(--line); padding:9px 11px; vertical-align:top}
+
+.timeline{list-style:none; padding:0; margin:0 0 26px; border-left:2px solid var(--line)}
+.timeline li{position:relative; padding:0 0 14px 22px}
+.timeline li::before{content:""; position:absolute; left:-7px; top:6px; width:12px; height:12px; border-radius:50%; background:var(--surface); border:2px solid var(--gold)}
+.timeline b{display:block; font-size:14.5px}
+.timeline span{color:var(--muted); font-size:13.5px}
+
+.navrow{display:flex; justify-content:space-between; gap:12px; margin-top:36px; padding-top:22px; border-top:1px solid var(--line)}
+.btn{border:0; border-radius:11px; padding:12px 22px; font-weight:700; cursor:pointer; font-size:14.5px}
+.btn.primary{background:var(--navy); color:#fff}
+.btn.primary:hover{filter:brightness(1.15)}
+:root[data-theme="dark"] .btn.primary{background:var(--gold); color:var(--navy)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{background:var(--gold); color:var(--navy)}}
+.btn.ghost{background:transparent; border:1.5px solid var(--line); color:var(--ink)}
+.btn.gold{background:var(--gold); color:var(--navy)}
+
+/* welcome */
+.welcome h2{font-size:clamp(32px,5vw,48px)}
+.facts{display:flex; flex-wrap:wrap; gap:26px; margin:6px 0 30px}
+.facts div{font-size:13.5px; color:var(--muted)}
+.facts strong{display:block; font-family:var(--display); font-size:22px; color:var(--ink)}
+.steps-preview{columns:2; column-gap:28px; padding:0; margin:0 0 30px; list-style:none; font-size:14px}
+.steps-preview li{break-inside:avoid; padding:5px 0; border-bottom:1px solid var(--line); display:flex; gap:10px}
+.steps-preview li span{color:var(--gold); font-weight:700; width:22px}
+
+/* review */
+.rev-sec{border:1.5px solid var(--line); border-radius:14px; background:var(--surface); margin-bottom:12px; overflow:hidden}
+.rev-sec summary{display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer; list-style:none; font-weight:600}
+.rev-sec summary::-webkit-details-marker{display:none}
+.rev-sec summary .rp{margin-left:auto; font-size:12.5px; color:var(--muted); font-weight:500}
+.rev-body{padding:0 18px 14px}
+.rev-row{padding:9px 0; border-top:1px solid var(--line); font-size:14px}
+.rev-row b{display:block; font-size:12.5px; color:var(--muted); font-weight:600; margin-bottom:2px}
+.rev-row p{margin:0; white-space:pre-wrap}
+.rev-empty{color:var(--muted); font-style:italic; font-size:13.5px; padding:6px 0}
+.exports{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin:6px 0 30px}
+.exp{border:1.5px solid var(--line); background:var(--surface); border-radius:14px; padding:16px; text-align:left; cursor:pointer}
+.exp:hover{border-color:var(--navy)}
+.exp b{display:block; font-family:var(--display); font-size:16px; margin-bottom:3px}
+.exp span{font-size:13px; color:var(--muted)}
+.exp.main-exp{background:var(--navy); color:#fff; border-color:var(--navy)}
+.exp.main-exp span{color:#C5CBD8}
+
+.toast{position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom,0px)); transform:translate(-50%,20px); background:var(--ink); color:var(--bg); padding:11px 18px; border-radius:10px; font-size:14px; opacity:0; pointer-events:none; transition:.25s; z-index:50; max-width:90vw}
+.toast.show{opacity:1; transform:translate(-50%,0)}
+.scrim{display:none}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed; inset:0 auto 0 0; width:min(320px,86vw); z-index:30; transform:translateX(-100%); transition:transform .25s ease; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+  .side.open{transform:none}
+  .scrim{position:fixed; inset:0; background:rgba(8,12,24,.5); z-index:25}
+  .scrim.open{display:block}
+  .menu-btn{display:inline-block}
+  .top-inner{padding:10px 16px; padding-top:calc(10px + env(safe-area-inset-top,0px))}
+  .topbar{top:0}
+  .content{padding:28px 18px 40px}
+  .grid2{grid-template-columns:1fr}
+  .steps-preview{columns:1}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+/* print */
+.print-only{display:none}
+@media print{
+  body{background:#fff; color:#000; height:auto}
+  .app{display:block}
+  .side,.topbar,.navrow,.exports,.no-print,.toast{display:none!important}
+  .scroll{overflow:visible}
+  .content{max-width:none; padding:0}
+  .rev-sec{border:0; break-inside:auto}
+  .rev-sec .rev-body{display:block!important}
+  details.rev-sec > *{display:block}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side" aria-label="Etapas do briefing">
+    <div class="brand">
+      <h1>Briefing de site profissional</h1>
+      <p>Escopo completo de conteúdo e estrutura</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 60 60" aria-hidden="true">
+        <circle class="bgc" cx="30" cy="30" r="25"/>
+        <circle class="fg" id="ringFg" cx="30" cy="30" r="25" stroke-dasharray="157.08" stroke-dashoffset="157.08" transform="rotate(-90 30 30)"/>
+        <text id="ringTxt" x="30" y="35" text-anchor="middle">0%</text>
+      </svg>
+      <div><strong id="ringCount">0 de 0 respostas</strong><small>Preenchidas até agora</small></div>
+    </div>
+    <nav class="steps" id="steps"></nav>
+    <div class="side-foot"><span class="dot" id="saveDot"></span><span id="saveTxt">Salvo neste navegador</span></div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="top-inner">
+        <button class="menu-btn" id="menuBtn" aria-controls="side" aria-expanded="false">Etapas</button>
+        <div class="top-title" id="topTitle"></div>
+        <span class="pct" id="pct">0%</span>
+        <button class="icon-btn" id="themeBtn" title="Alternar tema claro/escuro" aria-label="Alternar tema">◐</button>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Progresso do briefing" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="pbar"><i id="pfill"></i></div>
+    </header>
+    <div class="scroll" id="scroll">
+      <div class="content" id="content"></div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+
+<script>
+/* ====================== SCHEMA ====================== */
+const T=(id,label,o={})=>({id,type:'text',label,...o});
+const A=(id,label,o={})=>({id,type:'textarea',label,...o});
+const C=(id,label,options,o={})=>({id,type:'checks',label,options,...o});
+const R=(id,label,options,o={})=>({id,type:'radio',label,options,...o});
+const G=(title,hint)=>({type:'group',label:title,hint});
+const N=(html)=>({type:'note',html});
+const P=(id,label,item,fields,o={})=>({id,type:'repeat',label,item,fields,...o});
+
+const SECTIONS=[
+{id:'projeto',title:'Dados do projeto',lead:'Quem está contratando, quem aprova e qual é o prazo.',fields:[
+  {row:[T('nome','Nome do profissional ou empresa'),T('fantasia','Nome como aparecerá no site')]},
+  {row:[T('doc','CNPJ ou CPF'),T('responsavel','Responsável pelo projeto')]},
+  {row:[T('cargo','Cargo / função'),T('whatsapp','Telefone / WhatsApp',{inputType:'tel'})]},
+  {row:[T('email','E-mail',{inputType:'email'}),T('aprovador','Quem aprova as entregas?')]},
+  {row:[T('dominio','Domínio existente',{ph:'www.seunome.com.br'}),T('siteAtual','Site atual (se houver)',{inputType:'url',ph:'https://'})]},
+  {row:[T('lancamento','Data desejada de lançamento',{inputType:'date'}),T('motivo','Algum evento ou prazo motiva o projeto?')]},
+  G('Situação atual'),
+  C('situacao','Marque o que se aplica',['Não tenho site, será o primeiro','Tenho site e quero refazer do zero','Tenho site e quero apenas atualizar','Tenho apenas redes sociais','Tenho domínio registrado','Tenho e-mail profissional (@meudominio)']),
+  A('funciona','O que funciona e o que não funciona no site atual?'),
+]},
+{id:'profissional',title:'Sobre o profissional',lead:'Estas respostas alimentam as páginas Sobre e Equipe e dão credibilidade ao site.',fields:[
+  {row:[T('profissao','Profissão / especialidade principal'),T('registro','Registro profissional',{ph:'OAB, CRM, CRP, CREA, CRC, CRN…'})]},
+  {row:[T('inicio','Ano de início da atuação',{inputType:'number',ph:'2012'}),T('regiao','Cidades e regiões atendidas')]},
+  R('modalidade','Como você atende?',['Presencial','Online','Presencial e online']),
+  {row:[T('endereco','Endereço do local de atendimento'),T('horario','Horário de atendimento',{ph:'Seg a sex, 8h às 18h'})]},
+  A('formacao','Formação acadêmica',{hint:'Graduação, pós, mestrado, doutorado, com instituição e ano.'}),
+  A('cursos','Cursos, certificações e especializações'),
+  A('premios','Prêmios, publicações, palestras, entidades'),
+  G('Sua história'),
+  A('historia','Por que escolheu essa profissão? Conte sua trajetória.',{rows:5}),
+  A('metodo','Como você trabalha? Método, abordagem, filosofia.',{rows:5}),
+  A('numeros','Números e marcos da carreira',{hint:'Clientes atendidos, casos, anos, projetos entregues.'}),
+  G('Equipe','Deixe vazio se você trabalha sozinho.'),
+  P('equipe','Equipe','Integrante',[T('nome','Nome'),T('cargo','Cargo / especialidade'),T('registro','Registro profissional'),A('bio','Mini bio (2 a 3 linhas)')]),
+]},
+{id:'posicionamento',title:'Posicionamento e diferenciais',lead:'Como você quer ser percebido. É a base da mensagem principal do site.',fields:[
+  A('frase','Em uma frase: o que você faz, para quem e qual resultado entrega?',{rows:3}),
+  {row:[A('missao','Missão',{rows:3}),A('visao','Visão',{rows:3})]},
+  A('valores','Valores (3 a 5 palavras ou frases)',{rows:2}),
+  A('diferenciais','Seus 3 principais diferenciais em relação a outros profissionais',{rows:4}),
+  A('elogios','O que os clientes mais elogiam no seu trabalho?'),
+  A('evitarImagem','Que imagem você não quer transmitir?',{rows:2}),
+  G('Personalidade da marca'),
+  C('personalidade','Escolha até 4',['Sério e formal','Próximo e acolhedor','Técnico e especialista','Moderno e inovador','Tradicional e sólido','Sofisticado / premium','Acessível / popular','Didático e educativo','Dinâmico e jovem','Discreto e sóbrio'],{max:4}),
+  G('Tom de voz do texto'),
+  C('tom','Marque as preferências',['Tratar o leitor por “você”','Tratar o leitor por “o senhor / a senhora”','Texto em 1ª pessoa (“eu atendo…”)','Texto em 1ª pessoa do plural (“nós…”)','Texto em 3ª pessoa (“Dra. Ana atende…”)','Evitar jargão técnico']),
+]},
+{id:'objetivos',title:'Objetivos do site',lead:'O objetivo principal define o botão de ação de todas as páginas.',fields:[
+  C('objetivos','O que o site precisa fazer por você?',['Gerar contatos e orçamentos','Agendar consultas ou reuniões','Levar o visitante ao WhatsApp','Transmitir autoridade e credibilidade','Apresentar serviços em detalhe','Mostrar portfólio e casos de sucesso','Atrair clientes pelo Google','Receber tráfego de anúncios','Publicar artigos educativos','Captar e-mails','Vender cursos, e-books ou produtos','Recrutar profissionais ou parceiros','Área restrita para clientes','Atender clientes de outras cidades ou países']),
+  {row:[T('acaoPrincipal','A ação nº 1 que o visitante deve realizar'),T('textoBotao','Texto do botão principal',{ph:'Agende sua consulta'})]},
+  A('metas','Metas mensuráveis',{hint:'Ex.: 20 contatos por mês; primeira página do Google para “advogado trabalhista em Palmas”.'}),
+  A('canais','Como você recebe clientes hoje?',{hint:'Indicação, Instagram, Google, convênios…',rows:2}),
+]},
+{id:'publico',title:'Público-alvo',lead:'Quanto melhor você descrever o cliente, mais o texto vai falar com ele.',fields:[
+  A('perfil','Quem é o cliente ideal?',{hint:'Idade, profissão, renda, região, pessoa física ou empresa.'}),
+  A('dor','Que problema ou necessidade leva essa pessoa a procurar você?'),
+  A('medos','Quais dúvidas e medos ela tem antes de contratar?'),
+  A('buscas','O que ela digita no Google?',{hint:'Escreva frases exatamente como ela digitaria.'}),
+  A('decisao','O que a faz escolher um profissional e não outro?',{rows:3}),
+  A('secundario','Existe público secundário?',{hint:'Empresas, parceiros, imprensa, outros profissionais.',rows:2}),
+  G('Persona','Descreva um cliente típico, real ou inspirado em alguém real.'),
+  {row:[T('pNome','Nome fictício e idade'),T('pOcupacao','Ocupação e rotina')]},
+  A('pSituacao','Situação que o fez buscar ajuda',{rows:2}),
+  {row:[A('pObjecoes','Objeções antes de contratar',{rows:2}),A('pResultado','Resultado que ele espera',{rows:2})]},
+  G('Perguntas frequentes','Estas viram a página FAQ.'),
+  P('faq','Perguntas frequentes','Pergunta',[T('pergunta','Pergunta que os clientes sempre fazem'),A('resposta','Resposta resumida',{rows:3})],{start:1}),
+]},
+{id:'concorrencia',title:'Concorrência e referências',lead:'Ajuda a encontrar espaço para se destacar e a entender o seu gosto.',fields:[
+  G('Concorrentes diretos'),
+  P('concorrentes','Concorrentes','Concorrente',[{row:[T('nome','Nome'),T('link','Site ou Instagram')]},{row:[A('bem','O que fazem bem',{rows:2}),A('mal','O que fazem mal',{rows:2})]}]),
+  G('Sites de referência','De qualquer área, não só da sua.'),
+  P('referencias','Referências','Referência',[T('link','Endereço do site',{inputType:'url',ph:'https://'}),{row:[A('gosta','Gosto de…',{rows:2}),A('naoGosta','Não gosto de…',{rows:2})]}]),
+  A('naoQuer','Algo que você definitivamente não quer ver no seu site?',{rows:2}),
+]},
+{id:'visual',title:'Identidade visual',lead:'Logo, cores, estilo e imagens.',fields:[
+  C('logo','Logotipo e marca',['Tenho logo em vetor (AI, EPS, SVG, PDF)','Tenho logo só em imagem (PNG/JPG)','Tenho manual de marca','Não tenho logo, preciso criar','Quero atualizar o logo atual','Uso apenas o nome escrito']),
+  {row:[T('coresMarca','Cores da marca',{ph:'#14213D, #C9A227'}),T('fontes','Fontes da marca (se houver)')]},
+  {row:[T('coresGosta','Cores de que gosta'),T('coresEvita','Cores que não quer usar')]},
+  G('Estilo visual'),
+  C('estilo','Escolha até 3',['Minimalista, muito espaço em branco','Clássico e elegante','Escuro e sofisticado','Claro e leve','Colorido e vibrante','Corporativo','Orgânico / natural','Tecnológico'],{max:3}),
+  G('Imagens'),
+  C('imagens','O que você já tem ou prefere',['Fotos profissionais recentes (retrato)','Fotos do espaço / escritório / consultório','Fotos da equipe','Fotos de trabalhos ou projetos','Preciso de sessão de fotos','Aceito banco de imagens','Tenho vídeo institucional','Quero ícones e ilustrações']),
+  N('<b>Dica:</b> fotos reais do profissional e do ambiente aumentam muito a confiança do visitante. Prefira um bom retrato profissional a imagens genéricas de banco.'),
+]},
+{id:'paginas',title:'Páginas do site',lead:'Marque as páginas que o site terá. As marcadas com ★ são recomendadas para quase todo site profissional.',fields:[
+  C('paginas','Mapa do site',['Home (Início) ★','Sobre ★','Serviços / Áreas de atuação ★','Página individual para cada serviço','Equipe','Portfólio / Casos / Projetos','Depoimentos','Blog / Artigos','Perguntas frequentes','Contato / Agendamento ★','Convênios / Planos / Parcerias','Materiais gratuitos','Cursos / Loja','Trabalhe conosco','Imprensa / Mídia','Área do cliente','Política de Privacidade ★','Termos de Uso / Cookies','Página 404 personalizada']),
+  {row:[T('outrasPaginas','Outras páginas'),T('idiomas','Idiomas do site',{ph:'Português, inglês…'})]},
+  N('<b>Menu sugerido:</b> Início, Sobre, Serviços (com submenu), Casos, Blog, Contato e um botão de destaque para agendar. No rodapé: endereço, horários, contatos, redes sociais, registro profissional, CNPJ e links legais.'),
+]},
+{id:'home',title:'Conteúdo: Home e Sobre',lead:'O roteiro das duas páginas mais visitadas. Escreva do seu jeito; a redação final é lapidada depois.',fields:[
+  G('Home'),
+  T('heroTitulo','Título principal do topo',{hint:'Sua promessa ou especialidade em poucas palavras.'}),
+  A('heroSub','Subtítulo (1 a 2 linhas)',{rows:2}),
+  A('credibilidade','Barra de credibilidade',{hint:'Números, selos, logos de clientes, mídia.',rows:2}),
+  A('homeDor','Situações que o cliente vive e que você resolve',{rows:3}),
+  A('comoFunciona','Como funciona o atendimento, passo a passo',{hint:'Ex.: 1. Contato  2. Avaliação  3. Proposta  4. Acompanhamento',rows:3}),
+  A('ctaFinal','Chamada final da página',{rows:2}),
+  G('Sobre'),
+  A('sobreAbertura','Frase de abertura da página Sobre',{rows:2}),
+  A('espaco','Descrição do espaço de atendimento',{rows:2}),
+]},
+{id:'servicos',title:'Conteúdo: Serviços',lead:'Cada serviço importante deve ter a própria página. Isso ajuda no Google e nos anúncios.',fields:[
+  P('servicos','Serviços','Serviço',[
+    T('nome','Nome do serviço'),
+    A('paraQuem','Para quem é e quando procurar',{rows:2}),
+    A('incluido','O que está incluído e como funciona',{rows:3}),
+    A('beneficios','Benefícios e resultados esperados',{rows:2}),
+    {row:[T('formato','Duração, formato, frequência'),T('preco','Preço ou faixa de preço')]},
+    R('exibirPreco','Mostrar o preço no site?',['Sim','Não','A combinar']),
+    A('faq','Perguntas frequentes sobre este serviço',{rows:2}),
+    T('palavras','Palavras que as pessoas usam para buscá-lo'),
+  ],{start:1}),
+]},
+{id:'provas',title:'Conteúdo: Casos e depoimentos',lead:'Provas reais de resultado. Confira antes as regras do seu conselho profissional.',fields:[
+  G('Casos e portfólio'),
+  P('casos','Casos','Caso',[T('titulo','Título do caso'),{row:[A('antes','Situação inicial',{rows:2}),A('feito','O que foi feito',{rows:2})]},A('resultado','Resultado',{rows:2}),R('imagens','Tem imagens?',['Sim','Não'])]),
+  G('Depoimentos'),
+  P('depoimentos','Depoimentos','Depoimento',[{row:[T('nome','Nome ou iniciais'),T('perfil','Cidade / perfil')]},A('texto','Depoimento',{rows:3}),R('autorizado','Cliente autorizou o uso por escrito?',['Sim','Ainda não'])]),
+]},
+{id:'blogContato',title:'Conteúdo: Blog e contato',lead:'Conteúdo educativo e todos os canais para o cliente falar com você.',fields:[
+  G('Blog'),
+  R('temBlog','Haverá blog?',['Sim','Não','Mais adiante']),
+  {row:[T('frequencia','Frequência de publicação'),T('autor','Quem escreverá os textos?')]},
+  A('temas','Temas e categorias principais',{rows:2}),
+  A('ideias','10 ideias de artigos iniciais',{rows:6}),
+  G('Contato'),
+  {row:[T('telefone','Telefone fixo',{inputType:'tel'}),T('zap','WhatsApp para o botão',{inputType:'tel'})]},
+  {row:[T('emailContato','E-mail que recebe os contatos',{inputType:'email'}),T('enderecoMapa','Endereço para o mapa')]},
+  A('redes','Redes sociais (links)',{rows:2}),
+  A('camposForm','Campos do formulário',{hint:'Nome, e-mail, telefone, assunto, mensagem, outros.',rows:2}),
+  {row:[T('posEnvio','Mensagem após o envio'),T('prazoRetorno','Prazo de retorno ao cliente')]},
+  G('Rodapé'),
+  C('rodape','Itens do rodapé',['Logo e frase curta','Endereço e mapa','Telefone, WhatsApp e e-mail','Horários','Ícones das redes sociais','Registro profissional e responsável técnico','CNPJ / razão social','Links de privacidade, termos e cookies','Menu secundário','Assinatura de newsletter']),
+]},
+{id:'funcionalidades',title:'Funcionalidades',lead:'Recursos que o site precisa ter.',fields:[
+  C('recursos','Marque tudo o que for necessário',['Design responsivo (celular, tablet, computador)','Botão flutuante de WhatsApp','Formulário de contato por e-mail','Agendamento online','Integração com sistema de gestão / prontuário','Mapa do Google','Chat online / chatbot','Newsletter','Pop-up de captura de e-mail','Galeria de fotos e vídeos','Blog com categorias e busca','Área restrita de clientes','Pagamento online (Pix, cartão, boleto)','Venda de cursos / produtos','Site em mais de um idioma','Feed do Instagram','Avaliações do Google no site','Aviso de cookies (LGPD)','Acessibilidade (contraste, VLibras)','Painel para eu mesmo editar os textos']),
+  A('outrosRecursos','Outras funcionalidades ou integrações',{rows:3}),
+  T('manutencao','Quem fará a manutenção depois da entrega?'),
+]},
+{id:'seo',title:'SEO e marketing',lead:'Para o site ser encontrado por quem procura o seu serviço.',fields:[
+  A('keywords','Palavras-chave principais',{hint:'Serviço + cidade. Ex.: “psicólogo infantil em Araguaína”.',rows:4}),
+  A('regioesBusca','Bairros e cidades em que quer aparecer',{rows:2}),
+  C('marketing','Ferramentas e ações',['Já tenho Perfil da Empresa no Google','Quero criar ou otimizar o Perfil no Google','Instalar Google Analytics 4','Instalar Google Search Console','Instalar Meta Pixel','Instalar Google Tag Manager','Farei anúncios no Google','Farei anúncios no Instagram/Facebook','Quero páginas específicas para anúncios','Quero relatório mensal de acessos']),
+  N('<b>Incluído no escopo técnico:</b> títulos e descrições únicos por página, URLs amigáveis, imagens otimizadas com texto alternativo, dados estruturados, sitemap e carregamento rápido.'),
+]},
+{id:'tecnico',title:'Requisitos técnicos',lead:'Domínio, hospedagem, e-mail e plataforma.',fields:[
+  R('dominioSit','Domínio',['Já tenho','Preciso registrar']),
+  T('dominioNome','Domínio desejado ou atual',{ph:'seunome.com.br'}),
+  R('hospedagem','Hospedagem',['Já tenho','Preciso contratar','Quero indicação']),
+  T('hospedagemQual','Qual hospedagem, se já tiver?'),
+  R('emailProf','E-mail profissional',['Google Workspace','Microsoft 365','Da hospedagem','Ainda não sei']),
+  R('cms','Plataforma',['WordPress','Webflow','Wix','Código próprio','Sem preferência']),
+  R('backup','Backup',['Diário','Semanal','Ainda não sei']),
+  T('migracao','Migrar conteúdo de algum lugar? De onde?'),
+  T('acessos','Quem fica com os acessos (domínio, hospedagem, painel)?'),
+]},
+{id:'etica',title:'Ética profissional e LGPD',lead:'Profissões regulamentadas têm regras próprias de publicidade.',fields:[
+  {type:'norms'},
+  R('area','Sua área',['Advocacia','Medicina','Psicologia','Odontologia','Nutrição','Fisioterapia','Contabilidade','Engenharia / Arquitetura','Outra / não regulamentada']),
+  C('lgpd','Conformidade',['Conteúdo será revisado pelo próprio profissional','Conteúdo será revisado por assessoria jurídica','Haverá Política de Privacidade','Haverá aviso de cookies com consentimento','Formulários terão aceite de uso de dados','Contato de privacidade (encarregado) definido']),
+  T('dadosObrigatorios','Dados obrigatórios que devem aparecer no site',{ph:'Ex.: CRM e RQE, OAB/UF nº…'}),
+  A('restricoes','Restrições específicas da sua área',{rows:2}),
+]},
+{id:'materiais',title:'Materiais',lead:'Marque o que você já tem pronto para enviar.',fields:[
+  C('materiais','Já tenho e posso enviar',['Logotipo em vetor','Manual de marca / paleta','Fotos do profissional','Fotos do espaço e equipe','Texto da história / bio','Descrição de cada serviço','Depoimentos autorizados','Casos / portfólio','Certificados e registros','Logos de clientes / parceiros','Vídeos','Acessos (domínio, hospedagem, redes)','Textos legais (privacidade, termos)']),
+  T('prazoMateriais','Até quando consegue enviar os materiais?',{inputType:'date'}),
+]},
+{id:'cronograma',title:'Cronograma',lead:'Etapas típicas de um projeto. Os prazos dependem do envio dos materiais e das aprovações.',fields:[
+  {type:'timeline'},
+  {row:[T('revisoes','Rodadas de revisão desejadas'),T('canal','Canal oficial de comunicação',{ph:'WhatsApp, e-mail…'})]},
+  T('reunioes','Frequência de reuniões ou atualizações'),
+]},
+{id:'investimento',title:'Investimento',lead:'Ajuda a dimensionar o projeto de forma realista.',fields:[
+  R('faixa','Faixa de investimento no site',['Até R$ 2.000','R$ 2.000 a R$ 5.000','R$ 5.000 a R$ 10.000','R$ 10.000 a R$ 20.000','Acima de R$ 20.000','Prefiro receber proposta']),
+  {row:[T('pagamento','Forma de pagamento preferida'),T('mensalManut','Orçamento mensal para manutenção')]},
+  T('mensalAds','Orçamento mensal para anúncios (se houver)'),
+  A('obs','Observações finais',{rows:4}),
+]},
+];
+
+const TIMELINE=[['Briefing e imersão','Briefing aprovado e reunião de alinhamento · 3 a 5 dias'],['Arquitetura','Mapa do site e estrutura das páginas · 3 a 5 dias'],['Conteúdo','Textos de todas as páginas para aprovação · 7 a 15 dias'],['Wireframe','Esboço do layout · 3 a 5 dias'],['Design','Layout visual da Home e páginas internas · 7 a 10 dias'],['Desenvolvimento','Site funcional em ambiente de testes · 10 a 20 dias'],['Revisão e testes','Ajustes e testes em dispositivos · 3 a 7 dias'],['Lançamento','Publicação, SEO técnico, Analytics e treinamento · 1 a 3 dias'],['Pós-lançamento','Suporte e correções · 30 dias']];
+
+/* ====================== STATE ====================== */
+const KEY='briefing-site-profissional-v1';
+let S={}; let step=-1; // -1 = welcome, SECTIONS.length = review
+try{ const raw=localStorage.getItem(KEY); if(raw){ const o=JSON.parse(raw); S=o.data||{}; step=typeof o.step==='number'?o.step:-1; } }catch(e){}
+const hasSaved=()=>Object.keys(S).length>0;
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function flat(fields){ const out=[]; fields.forEach(f=>{ if(f.row) out.push(...f.row); else out.push(f); }); return out; }
+function answerable(sec){ return flat(sec.fields).filter(f=>['text','textarea','checks','radio','repeat'].includes(f.type)); }
+function filled(f,val){
+  if(f.type==='checks') return Array.isArray(val)&&val.length>0;
+  if(f.type==='repeat') return Array.isArray(val)&&val.some(it=>it&&Object.values(it).some(v=>String(v||'').trim()));
+  return val!=null && String(val).trim()!=='';
+}
+function secProgress(sec){ const fs=answerable(sec); const d=S[sec.id]||{}; const n=fs.filter(f=>filled(f,d[f.id])).length; return {n,t:fs.length}; }
+function totalProgress(){ let n=0,t=0; SECTIONS.forEach(s=>{const p=secProgress(s); n+=p.n; t+=p.t;}); return {n,t,pct:t?Math.round(n/t*100):0}; }
+
+let saveTimer;
+function save(){
+  $('#saveDot').classList.add('saving'); $('#saveTxt').textContent='Salvando…';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    try{ localStorage.setItem(KEY,JSON.stringify({data:S,step,ts:Date.now()})); $('#saveTxt').textContent='Salvo neste navegador'; }
+    catch(e){ $('#saveTxt').textContent='Não foi possível salvar aqui. Exporte um backup.'; }
+    $('#saveDot').classList.remove('saving');
+  },400);
+}
+
+/* ====================== RENDER: SIDEBAR & PROGRESS ====================== */
+function renderSteps(){
+  const nav=$('#steps'); let h='';
+  SECTIONS.forEach((s,i)=>{
+    const p=secProgress(s); const done=p.t&&p.n===p.t;
+    h+=`<button class="step-btn ${done?'done':''}" data-go="${i}" ${i===step?'aria-current="step"':''}>
+      <span class="step-num">${done?'✓':i+1}</span>
+      <span class="step-txt"><span>${esc(s.title)}</span><span class="step-bar"><i style="width:${p.t?p.n/p.t*100:0}%"></i></span></span></button>`;
+  });
+  h+=`<button class="step-btn" data-go="${SECTIONS.length}" ${step===SECTIONS.length?'aria-current="step"':''}><span class="step-num">★</span><span class="step-txt"><span>Revisar e exportar</span></span></button>`;
+  nav.innerHTML=h;
+}
+function updateProgress(){
+  const tp=totalProgress();
+  $('#pfill').style.width=tp.pct+'%'; $('#pbar').setAttribute('aria-valuenow',tp.pct);
+  $('#pct').textContent=tp.pct+'%'; $('#ringTxt').textContent=tp.pct+'%';
+  $('#ringFg').style.strokeDashoffset=157.08*(1-tp.pct/100);
+  $('#ringCount').textContent=`${tp.n} de ${tp.t} respostas`;
+  document.querySelectorAll('#steps .step-btn').forEach((b,i)=>{
+    const s=SECTIONS[i]; if(!s) return; const p=secProgress(s); const done=p.t&&p.n===p.t;
+    b.classList.toggle('done',!!done); b.querySelector('.step-num').textContent=done?'✓':i+1;
+    b.querySelector('.step-bar i').style.width=(p.t?p.n/p.t*100:0)+'%';
+  });
+  const live=document.querySelector('[data-secprog]'); if(live&&SECTIONS[step]){const p=secProgress(SECTIONS[step]); live.textContent=`${p.n} de ${p.t} itens preenchidos nesta etapa`;}
+}
+
+/* ====================== RENDER: FIELDS ====================== */
+let uid=0;
+function fieldHTML(f,val,path){
+  const id='f'+(uid++); const hint=f.hint?`<span class="hint">${esc(f.hint)}</span>`:'';
+  const dp=`data-path="${esc(path)}" data-type="${f.type}"`;
+  if(f.type==='group') return `<h3 class="group-title">${esc(f.label)}</h3>${f.hint?`<p class="group-hint">${esc(f.hint)}</p>`:''}`;
+  if(f.type==='note') return `<div class="note">${f.html}</div>`;
+  if(f.type==='timeline') return `<ol class="timeline">${TIMELINE.map(t=>`<li><b>${t[0]}</b><span>${t[1]}</span></li>`).join('')}</ol>`;
+  if(f.type==='norms') return `<div class="tbl-wrap"><table class="norms"><thead><tr><th>Área</th><th>Norma de referência</th><th>Pontos de atenção</th></tr></thead><tbody>
+    <tr><td>Advocacia</td><td>Código de Ética da OAB e Provimento 205/2021</td><td>Caráter informativo, sem captação de clientela nem promessa de resultado.</td></tr>
+    <tr><td>Medicina</td><td>Código de Ética Médica e Resolução CFM 2.336/2023</td><td>Exibir CRM e RQE; vedadas promessas de resultado e sensacionalismo.</td></tr>
+    <tr><td>Psicologia</td><td>Código de Ética do Psicólogo (CFP)</td><td>Exibir CRP; cuidado com depoimentos, promessas de cura e sigilo.</td></tr>
+    <tr><td>Outras</td><td>Normas do conselho respectivo (CFO, CFN, COFFITO, CFC, CONFEA…)</td><td>Verificar regras sobre antes/depois, preços, depoimentos e títulos.</td></tr>
+    </tbody></table></div><p class="group-hint">As normas mudam; confirme a versão vigente no site do seu conselho.</p>`;
+  if(f.type==='text'){
+    return `<div class="field"><label class="lb" for="${id}">${esc(f.label)}${hint}</label><input class="in" id="${id}" type="${f.inputType||'text'}" ${dp} value="${esc(val||'')}" placeholder="${esc(f.ph||'')}"></div>`;
+  }
+  if(f.type==='textarea'){
+    return `<div class="field"><label class="lb" for="${id}">${esc(f.label)}${hint}</label><textarea class="in" id="${id}" rows="${f.rows||4}" ${dp} placeholder="${esc(f.ph||'')}">${esc(val||'')}</textarea></div>`;
+  }
+  if(f.type==='checks'||f.type==='radio'){
+    const arr=f.type==='checks'?(Array.isArray(val)?val:[]):[val];
+    const inType=f.type==='checks'?'checkbox':'radio';
+    const opts=f.options.map(o=>{
+      const lab=esc(o).replace('★','<em>★</em>');
+      return `<label class="opt"><input type="${inType}" name="${id}" value="${esc(o)}" ${arr.includes(o)?'checked':''} ${dp} ${f.max?`data-max="${f.max}"`:''}><span>${lab}</span></label>`;
+    }).join('');
+    const lim=f.max?`<div class="limit" data-limit>${arr.length} de ${f.max} escolhidos</div>`:'';
+    return `<fieldset class="field" style="border:0;padding:0;margin:0 0 20px"><legend class="lb">${esc(f.label)}${hint}</legend><div class="opts">${opts}</div>${lim}</fieldset>`;
+  }
+  if(f.type==='repeat'){
+    let items=Array.isArray(val)?val:[];
+    let h='';
+    items.forEach((it,i)=>{
+      h+=`<div class="rep-item"><div class="rep-head"><b>${esc(f.item)} ${i+1}</b><button class="rm" data-rm="${esc(path)}" data-idx="${i}">Remover</button></div>`;
+      h+=fieldsHTML(f.fields,it||{},`${path}.${i}`);
+      h+=`</div>`;
+    });
+    h+=`<button class="add" data-add="${esc(path)}">+ Adicionar ${esc(f.item.toLowerCase())}</button>`;
+    return `<div class="field">${h}</div>`;
+  }
+  return '';
+}
+function fieldsHTML(fields,data,base){
+  return fields.map(f=>{
+    if(f.row) return `<div class="grid2">${f.row.map(x=>fieldHTML(x,data[x.id],`${base}.${x.id}`)).join('')}</div>`;
+    return fieldHTML(f,f.id?data[f.id]:null,f.id?`${base}.${f.id}`:base);
+  }).join('');
+}
+
+/* path helpers: "secId.field" or "secId.repeat.0.sub" */
+function getAt(path){ return path.split('.').reduce((o,k)=>o==null?undefined:o[k],S); }
+function setAt(path,v){
+  const ks=path.split('.'); let o=S;
+  ks.slice(0,-1).forEach((k,i)=>{ if(o[k]==null) o[k]=/^\d+$/.test(ks[i+1])?[]:{}; o=o[k]; });
+  o[ks[ks.length-1]]=v;
+}
+
+/* ====================== RENDER: PAGES ====================== */
+function render(){
+  uid=0; const c=$('#content');
+  if(step<0) c.innerHTML=welcomeHTML();
+  else if(step>=SECTIONS.length) c.innerHTML=reviewHTML();
+  else{
+    const s=SECTIONS[step]; const p=secProgress(s);
+    // ensure repeat with start
+    flat(s.fields).forEach(f=>{ if(f.type==='repeat'&&f.start&&!(S[s.id]&&Array.isArray(S[s.id][f.id])&&S[s.id][f.id].length)){ setAt(`${s.id}.${f.id}`,[{}]); } });
+    c.innerHTML=`<p class="kicker">Etapa ${step+1} de ${SECTIONS.length}</p><h2>${esc(s.title)}</h2><p class="lead">${esc(s.lead)} <br><span data-secprog style="font-size:13px">${p.n} de ${p.t} itens preenchidos nesta etapa</span></p>
+      ${fieldsHTML(s.fields,S[s.id]||{},s.id)}
+      <div class="navrow"><button class="btn ghost" data-go="${step-1}">Voltar</button><button class="btn primary" data-go="${step+1}">${step===SECTIONS.length-1?'Revisar respostas':'Próxima etapa'}</button></div>`;
+  }
+  const title=step<0?'Boas-vindas':step>=SECTIONS.length?'Revisar e exportar':`<b>${esc(SECTIONS[step].title)}</b> · etapa ${step+1} de ${SECTIONS.length}`;
+  $('#topTitle').innerHTML=title;
+  renderSteps(); updateProgress();
+  $('#scroll').scrollTop=0;
+  const cur=document.querySelector('#steps [aria-current="step"]'); if(cur) cur.scrollIntoView({block:'nearest'});
+}
+
+function welcomeHTML(){
+  const tp=totalProgress();
+  return `<div class="welcome"><p class="kicker">Briefing de projeto</p>
+  <h2>Vamos planejar o seu site profissional.</h2>
+  <p class="lead">Este formulário reúne tudo o que é preciso para escrever, desenhar e desenvolver o site: quem você é, para quem fala, o que cada página vai dizer e quais recursos o site terá. Suas respostas ficam salvas automaticamente neste navegador, então você pode parar e voltar quando quiser.</p>
+  <div class="facts"><div><strong>${SECTIONS.length}</strong>etapas</div><div><strong>~40 min</strong>para completar</div><div><strong>PDF</strong>gerado no final</div></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:34px">
+    <button class="btn primary" data-go="${hasSaved()?firstIncomplete():0}">${hasSaved()?`Continuar de onde parei (${tp.pct}%)`:'Começar o briefing'}</button>
+    <button class="btn ghost" data-action="import">Importar backup</button>
+  </div>
+  <ol class="steps-preview">${SECTIONS.map((s,i)=>`<li><span>${i+1}</span>${esc(s.title)}</li>`).join('')}</ol>
+  <div class="note"><b>Escreva do seu jeito.</b> Não se preocupe com o texto final. Prefira fatos a adjetivos: números, casos, métodos, formação, prazos e regiões atendidas rendem textos muito melhores do que “atendimento de qualidade”.</div></div>`;
+}
+function firstIncomplete(){ const i=SECTIONS.findIndex(s=>{const p=secProgress(s); return p.n<p.t;}); return i<0?SECTIONS.length:i; }
+
+function display(f,v){
+  if(f.type==='checks') return (v||[]).join('\n');
+  if(f.type==='repeat') return null;
+  if(f.inputType==='date'&&v){ const [y,m,d]=v.split('-'); return `${d}/${m}/${y}`; }
+  return v;
+}
+function reviewHTML(){
+  const tp=totalProgress();
+  let h=`<p class="kicker">Última etapa</p><h2>Revisar e exportar</h2>
+  <p class="lead">Você preencheu ${tp.n} de ${tp.t} itens (${tp.pct}%). Confira as respostas abaixo e gere o PDF para enviar à equipe do projeto.</p>
+  <div class="exports">
+    <button class="exp main-exp" data-action="pdf"><b>Baixar PDF</b><span>Documento formatado com todas as respostas</span></button>
+    <button class="exp" data-action="md"><b>Baixar texto</b><span>Arquivo .md para colar em outro lugar</span></button>
+    <button class="exp" data-action="json"><b>Salvar backup</b><span>Arquivo .json para continuar em outro aparelho</span></button>
+    <button class="exp" data-action="import"><b>Importar backup</b><span>Carregar um .json salvo antes</span></button>
+  </div>`;
+  SECTIONS.forEach((s,i)=>{
+    const p=secProgress(s); const d=S[s.id]||{};
+    h+=`<details class="rev-sec" ${i<2?'open':''}><summary><span class="step-num" style="border-color:var(--line);color:var(--muted)">${i+1}</span>${esc(s.title)}<span class="rp">${p.n}/${p.t}</span></summary><div class="rev-body">`;
+    let any=false;
+    flat(s.fields).forEach(f=>{
+      if(!['text','textarea','checks','radio','repeat'].includes(f.type)) return;
+      const v=d[f.id]; if(!filled(f,v)) return; any=true;
+      if(f.type==='repeat'){
+        v.forEach((it,k)=>{ if(!it||!Object.values(it).some(x=>String(x||'').trim())) return;
+          const sub=flat(f.fields).filter(x=>filled(x,it[x.id])).map(x=>`<b>${esc(x.label)}</b><p>${esc(display(x,it[x.id]))}</p>`).join('');
+          h+=`<div class="rev-row"><b style="color:var(--ink);font-size:13.5px">${esc(f.item)} ${k+1}</b>${sub}</div>`;});
+      } else h+=`<div class="rev-row"><b>${esc(f.label)}</b><p>${esc(display(f,v))}</p></div>`;
+    });
+    if(!any) h+=`<div class="rev-empty">Nada preenchido ainda. <button class="rm" data-go="${i}">Preencher esta etapa</button></div>`;
+    else h+=`<div style="padding-top:8px"><button class="rm" data-go="${i}">Editar esta etapa</button></div>`;
+    h+=`</div></details>`;
+  });
+  h+=`<div class="navrow"><button class="btn ghost" data-go="${SECTIONS.length-1}">Voltar</button><button class="btn ghost no-print" data-action="reset" style="color:#C0392B">Apagar tudo e recomeçar</button></div>`;
+  return h;
+}
+
+/* ====================== EVENTS ====================== */
+document.addEventListener('input',e=>{
+  const el=e.target; const path=el.dataset.path; if(!path) return;
+  const type=el.dataset.type;
+  if(type==='checks'){
+    const max=+el.dataset.max||0; let arr=Array.isArray(getAt(path))?[...getAt(path)]:[];
+    if(el.checked){ if(max&&arr.length>=max){ el.checked=false; const lim=el.closest('fieldset').querySelector('[data-limit]'); lim.classList.add('warn'); lim.textContent=`Máximo de ${max}. Desmarque uma opção para trocar.`; return; } arr.push(el.value); }
+    else arr=arr.filter(x=>x!==el.value);
+    setAt(path,arr);
+    const lim=el.closest('fieldset').querySelector('[data-limit]'); if(lim){lim.classList.remove('warn'); lim.textContent=`${arr.length} de ${max} escolhidos`;}
+  } else if(type==='radio'){ setAt(path,el.value); }
+  else setAt(path,el.value);
+  save(); updateProgress();
+});
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');
+  if(go){ e.preventDefault(); const n=+go.dataset.go; step=Math.max(-1,Math.min(SECTIONS.length,n)); closeMenu(); save(); render(); return; }
+  const add=e.target.closest('[data-add]');
+  if(add){ e.preventDefault(); const p=add.dataset.add; const arr=Array.isArray(getAt(p))?getAt(p):[]; arr.push({}); setAt(p,arr); save(); const y=$('#scroll').scrollTop; render(); $('#scroll').scrollTop=y;
+    const items=document.querySelectorAll(`[data-path^="${CSS.escape(p)}."]`); const last=[...items].filter(x=>x.dataset.path.startsWith(`${p}.${arr.length-1}.`))[0]; if(last){ last.focus({preventScroll:false}); } return; }
+  const rm=e.target.closest('[data-rm]');
+  if(rm){ e.preventDefault(); const p=rm.dataset.rm; const arr=getAt(p)||[]; arr.splice(+rm.dataset.idx,1); setAt(p,arr); save(); const y=$('#scroll').scrollTop; render(); $('#scroll').scrollTop=y; toast('Item removido'); return; }
+  const act=e.target.closest('[data-action]');
+  if(act){ e.preventDefault(); const a=act.dataset.action;
+    if(a==='pdf') exportPDF(); if(a==='md') exportMD(); if(a==='json') exportJSON(); if(a==='import') $('#importFile').click();
+    if(a==='reset'){ if(confirm('Apagar todas as respostas deste navegador? Isso não pode ser desfeito.')){ S={}; step=-1; try{localStorage.removeItem(KEY);}catch(_){} render(); toast('Respostas apagadas'); } }
+  }
+});
+$('#importFile').addEventListener('change',async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{ const o=JSON.parse(await f.text()); if(!o||typeof o!=='object'||!o.data) throw 0; S=o.data; step=firstIncomplete(); save(); render(); toast('Backup importado'); }
+  catch(_){ toast('Este arquivo não é um backup válido do briefing.'); }
+  e.target.value='';
+});
+function openMenu(){ $('#side').classList.add('open'); $('#scrim').classList.add('open'); $('#menuBtn').setAttribute('aria-expanded','true'); }
+function closeMenu(){ $('#side').classList.remove('open'); $('#scrim').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded','false'); }
+$('#menuBtn').onclick=openMenu; $('#scrim').onclick=closeMenu;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeMenu(); });
+$('#themeBtn').onclick=()=>{
+  const r=document.documentElement; const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  r.dataset.theme=dark?'light':'dark'; try{localStorage.setItem(KEY+'-theme',r.dataset.theme);}catch(_){}
+};
+try{ const th=localStorage.getItem(KEY+'-theme'); if(th) document.documentElement.dataset.theme=th; }catch(_){}
+
+let tt; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2800); }
+
+/* ====================== EXPORT ====================== */
+let downloadsP=null;
+function getDownloads(){ if(!downloadsP) downloadsP=(window.claude&&window.claude.use)?window.claude.use('downloads').catch(()=>null):Promise.resolve(null); return downloadsP; }
+async function offer(filename,data,fallbackMime){
+  const dl=await getDownloads();
+  if(dl){
+    try{ await dl.save({filename,data}); toast('Arquivo pronto: '+filename); return; }
+    catch(err){ if(err&&err.code==='declined') return; if(err&&err.code==='rate_limited'){ toast('Já existe um pedido de download aberto.'); return; } }
+  }
+  // fallback (página fora do visualizador do Claude)
+  try{ const blob=data instanceof Blob?data:new Blob([data],{type:fallbackMime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); }
+  catch(_){ toast('O download não está disponível aqui. Use Imprimir > Salvar como PDF.'); }
+}
+const clientName=()=>((S.projeto||{}).fantasia||(S.projeto||{}).nome||'cliente').trim();
+const slug=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase()||'cliente';
+
+function collect(){
+  return SECTIONS.map((s,i)=>{
+    const d=S[s.id]||{}; const rows=[];
+    flat(s.fields).forEach(f=>{
+      if(!['text','textarea','checks','radio','repeat'].includes(f.type)) return;
+      const v=d[f.id]; if(!filled(f,v)) return;
+      if(f.type==='repeat') v.forEach((it,k)=>{ if(!it||!Object.values(it).some(x=>String(x||'').trim())) return;
+        rows.push({sub:`${f.item} ${k+1}`}); flat(f.fields).forEach(x=>{ if(filled(x,it[x.id])) rows.push({label:x.label,value:display(x,it[x.id]),indent:true}); }); });
+      else rows.push({label:f.label,value:display(f,v),list:f.type==='checks'});
+    });
+    return {n:i+1,title:s.title,rows};
+  });
+}
+function exportJSON(){ offer(`briefing-${slug(clientName())}.json`,JSON.stringify({app:'briefing-site-profissional',version:1,exported:new Date().toISOString(),data:S},null,2),'application/json'); }
+function exportMD(){
+  let md=`# Briefing de website profissional\n\n**Cliente:** ${clientName()}  \n**Gerado em:** ${new Date().toLocaleDateString('pt-BR')}  \n**Preenchimento:** ${totalProgress().pct}%\n\n`;
+  collect().forEach(sec=>{ md+=`## ${sec.n}. ${sec.title}\n\n`; if(!sec.rows.length){md+='_Não preenchido._\n\n';return;}
+    sec.rows.forEach(r=>{ if(r.sub){md+=`### ${r.sub}\n\n`;return;} md+=`**${r.label}**\n\n${r.list?String(r.value).split('\n').map(x=>'- '+x).join('\n'):r.value}\n\n`; }); });
+  offer(`briefing-${slug(clientName())}.md`,md,'text/markdown');
+}
+function pdfSafe(s){ return String(s??'').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/…/g,'...').replace(/★/g,'*').replace(/[^\x00-\xFF•]/g,''); }
+async function exportPDF(){
+  if(!window.jspdf){ toast('Gerador de PDF indisponível. Use Imprimir > Salvar como PDF.'); setTimeout(()=>window.print(),600); return; }
+  toast('Gerando PDF…');
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'});
+  const W=210,H=297,M=18,CW=W-2*M; const navy=[20,33,61], gold=[201,162,39], ink=[30,36,48], muted=[98,107,124];
+  // capa
+  doc.setFillColor(...navy); doc.rect(0,0,W,H,'F');
+  doc.setFillColor(...gold); doc.rect(M,70,28,2.2,'F');
+  doc.setTextColor(185,191,204); doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('DOCUMENTO DE BRIEFING',M,62);
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(34); doc.text('Briefing de',M,92); doc.text('Website Profissional',M,107);
+  doc.setFont('helvetica','normal'); doc.setFontSize(13); doc.setTextColor(217,220,227);
+  doc.text(pdfSafe(clientName()),M,124);
+  const pr=(S.profissional||{}); if(pr.profissao) doc.text(pdfSafe(pr.profissao),M,132);
+  doc.setDrawColor(...gold); doc.setLineWidth(.6); doc.rect(M,232,CW,34);
+  doc.setFontSize(9); doc.setTextColor(...gold); doc.setFont('helvetica','bold');
+  doc.text('RESPONSÁVEL',M+6,243); doc.text('DATA',M+6,252); doc.text('PREENCHIMENTO',M+6,261);
+  doc.setFont('helvetica','normal'); doc.setTextColor(255,255,255); doc.setFontSize(10);
+  doc.text(pdfSafe((S.projeto||{}).responsavel||'-'),M+48,243); doc.text(new Date().toLocaleDateString('pt-BR'),M+48,252); doc.text(totalProgress().pct+'% completo',M+48,261);
+
+  let y=0; let page=1;
+  const header=()=>{ doc.setFillColor(...navy); doc.rect(0,0,W,11,'F'); doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text('BRIEFING  •  WEBSITE PROFISSIONAL',M,7); doc.setFillColor(...gold); doc.rect(W-M-16,0,16,11,'F'); doc.setTextColor(...navy); doc.setFontSize(9); doc.text(String(page),W-M-8,7,{align:'center'}); doc.setTextColor(...muted); doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.text(pdfSafe('Cliente: '+clientName()),M,H-8); doc.text('Documento confidencial',W-M,H-8,{align:'right'}); y=24; };
+  const newPage=()=>{ doc.addPage(); page++; header(); };
+  const need=h=>{ if(y+h>H-16) newPage(); };
+  newPage();
+  collect().forEach(sec=>{
+    need(22);
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(...gold); doc.text(String(sec.n).padStart(2,'0'),M,y);
+    doc.setTextColor(...navy); doc.text(pdfSafe(sec.title),M+11,y); y+=2.5; doc.setDrawColor(...gold); doc.setLineWidth(.5); doc.line(M,y,W-M,y); y+=7;
+    if(!sec.rows.length){ doc.setFont('helvetica','italic'); doc.setFontSize(9.5); doc.setTextColor(...muted); doc.text('Não preenchido.',M,y); y+=10; return; }
+    sec.rows.forEach(r=>{
+      if(r.sub){ need(12); doc.setFillColor(244,241,232); doc.rect(M,y-4.5,CW,7,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...navy); doc.text(pdfSafe(r.sub),M+2,y); y+=7; return; }
+      const x=r.indent?M+4:M, w=r.indent?CW-4:CW;
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.6); const lab=doc.splitTextToSize(pdfSafe(r.label),w);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      const val=r.list?String(r.value).split('\n').map(v=>'•  '+v).join('\n'):String(r.value);
+      const lines=doc.splitTextToSize(pdfSafe(val),w);
+      need(lab.length*4+Math.min(lines.length,3)*4.6+4);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.6); doc.setTextColor(...muted); doc.text(lab,x,y); y+=lab.length*4+.6;
+      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...ink);
+      lines.forEach(l=>{ need(5); doc.text(l,x,y); y+=4.6; });
+      y+=3.2;
+    });
+    y+=5;
+  });
+  // assinaturas
+  need(45); y+=10; doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(...ink);
+  doc.text(doc.splitTextToSize('Declaro que as informações deste briefing são verdadeiras e representam as necessidades do projeto. Alterações de escopo após a aprovação poderão impactar prazo e investimento.',CW),M,y); y+=24;
+  doc.setDrawColor(...navy); doc.setLineWidth(.4); doc.line(M,y,M+75,y); doc.line(W-M-75,y,W-M,y); y+=5; doc.setFontSize(8.5); doc.setTextColor(...muted);
+  doc.text('Cliente / Responsável',M,y); doc.text('Agência / Desenvolvedor',W-M-75,y);
+  const blob=doc.output('blob');
+  offer(`briefing-${slug(clientName())}.pdf`,blob,'application/pdf');
+}
+
+render();
+</script>
+</body>
+</html>
